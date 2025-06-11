@@ -1,22 +1,17 @@
 import speech_recognition as sr
 
-# Mapeia frases de voz para comandos internos
 VOICE_COMMANDS = {
     "ligar tudo": "ALL_ON",
     "ligar todos": "ALL_ON",
     "acionar tudo": "ALL_ON",
     "acionar todos": "ALL_ON",
     "desligar tudo": "ALL_OFF",
-    
     "ligar azul": "BLUE_ON",
     "acionar azul": "BLUE_ON",
-    
     "ligar vermelho": "RED_ON",
     "acionar vermelho": "RED_ON",
-    
     "ligar verde": "GREEN_ON",
     "acionar verde": "GREEN_ON",
-
     "encerrar": "EXIT",
     "finalizar": "EXIT",
     "terminar": "EXIT",
@@ -50,19 +45,16 @@ def reconhecer_comando():
     return None
 
 def main():
-    print("Modo comando por voz ativado. Diga 'ESC' para sair.")
+    print("Modo comando por voz ativado. Diga um comando, ou 'encerrar' para sair.")
     while True:
         comando = reconhecer_comando()
         if comando:
+            if comando == "EXIT":
+                print("Comando de encerramento detectado. Saindo do modo comando por voz...")
+                return "EXIT"
             # Aqui você pode enviar o comando para o Arduino ou outro sistema
             # Exemplo: send_command(comando)
-            pass
-        # Para sair, pode usar uma palavra chave, exemplo "esc"
-        # Se quiser implementar isso, pode alterar o reconhecimento:
-        if comando == "ESC":
-            print("Saindo do modo comando por voz.")
-            break
+        # Se comando for None ou não EXIT, continua escutando
 
 if __name__ == "__main__":
     main()
-
