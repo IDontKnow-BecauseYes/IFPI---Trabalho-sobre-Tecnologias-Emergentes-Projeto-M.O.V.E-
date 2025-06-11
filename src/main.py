@@ -45,9 +45,12 @@ if __name__ == "__main__":
                 continue  # volta para escolher modo
 
         elif modo == "hand_gesture":
-            import hand_gesture
-            hand_gesture.main()
-            break
+           import hand_gesture
+           resultado = hand_gesture.main()
+           if resultado == "EXIT":
+               print("Retornando ao menu principal após encerramento do modo por gestos.")
+               continue
+
 
         elif modo == "arduino_serial":
             import arduino_serial
