@@ -13,7 +13,7 @@ def escolher_modo():
     try:
         frase = recognizer.recognize_google(audio, language='pt-BR').lower()
         print(f"Você disse: {frase}")
-        if "robo" in frase:
+        if "lira" in frase:
             if "ira encerrar" in frase or "vai encerrar" in frase or "vai sair" in frase or "ira sair" in frase:
                 return "encerrar"
             elif "comando por voz" in frase:
