@@ -3,10 +3,26 @@ import speech_recognition as sr
 # Mapeia frases de voz para comandos internos
 VOICE_COMMANDS = {
     "ligar tudo": "ALL_ON",
+    "ligar todos": "ALL_ON",
+    "acionar tudo": "ALL_ON",
+    "acionar todos": "ALL_ON",
     "desligar tudo": "ALL_OFF",
+    
     "ligar azul": "BLUE_ON",
+    "acionar azul": "BLUE_ON",
+    
     "ligar vermelho": "RED_ON",
-    "ligar verde": "GREEN_ON"
+    "acionar vermelho": "RED_ON",
+    
+    "ligar verde": "GREEN_ON",
+    "acionar verde": "GREEN_ON",
+
+    "encerrar": "EXIT",
+    "finalizar": "EXIT",
+    "terminar": "EXIT",
+    "acabar": "EXIT",
+    "cessar": "EXIT",
+    "interromper": "EXIT"
 }
 
 def reconhecer_comando():
