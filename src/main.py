@@ -39,8 +39,10 @@ if __name__ == "__main__":
 
         elif modo == "voice_commands":
             import voice_commands
-            voice_commands.main()
-            break
+            resultado = voice_commands.main()
+            if resultado == "EXIT":
+                print("Retornando ao menu principal após encerramento do modo comando por voz.")
+                continue  # volta para escolher modo
 
         elif modo == "hand_gesture":
             import hand_gesture
