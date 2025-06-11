@@ -63,8 +63,11 @@ if __name__ == "__main__":
 
         elif modo == "eye_control":
             import eye_control
-            eye_control.main()
-            break
+            resultado = eye_control.main()
+            if resultado == "EXIT":
+                print("Retornando ao menu principal após encerramento do controle ocular.")
+                continue
+
 
         else:
             print("Modo inválido, tente novamente.")
