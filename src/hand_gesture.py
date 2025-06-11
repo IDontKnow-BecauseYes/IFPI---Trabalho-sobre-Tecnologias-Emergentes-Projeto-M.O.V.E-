@@ -43,10 +43,20 @@ def main():
                         fingers.append(1)
                     else:
                         fingers.append(0)
+
                 total_fingers = sum(fingers)
+
+                # Verificar se os 4 dedos estão levantados (sem o polegar)
+                if fingers == [0, 1, 1, 1, 1]:
+                    print("Sinal de encerrar detectado. Saindo do modo de gestos...")
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    return "EXIT"
+
                 cmd = COMMANDS.get(total_fingers)
                 if cmd:
                     send_command(cmd)
+
                 mp_draw.draw_landmarks(frame, handLms, mp_hands.HAND_CONNECTIONS)
 
         cv2.imshow('M.O.V.E Gesture Control', frame)
