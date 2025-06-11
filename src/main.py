@@ -4,7 +4,7 @@ def escolher_modo():
     recognizer = sr.Recognizer()
     mic = sr.Microphone()
     
-    print("Diga o nome do robô seguido do modo: 'comando por voz', 'comando por gestos', 'arduino' ou 'controle ocular'")
+    print("Diga o nome do robô seguido do modo: 'comando por voz', 'comando por gestos', 'arduino', 'controle ocular' ou 'ira encerrar' para sair.")
 
     with mic as source:
         recognizer.adjust_for_ambient_noise(source)
@@ -14,7 +14,9 @@ def escolher_modo():
         frase = recognizer.recognize_google(audio, language='pt-BR').lower()
         print(f"Você disse: {frase}")
         if "robo" in frase:
-            if "comando por voz" in frase:
+            if "ira encerrar" in frase or "vai encerrar" in frase or "vai sair" in frase or "ira sair" in frase:
+                return "encerrar"
+            elif "comando por voz" in frase:
                 return "voice_commands"
             elif "comando por gestos" in frase:
                 return "hand_gesture"
@@ -27,25 +29,37 @@ def escolher_modo():
         print("Erro no reconhecimento:", e)
     return None
 
+
 if __name__ == "__main__":
-    modo = None
-    while not modo:
+    while True:
         modo = escolher_modo()
+        if modo == "encerrar":
+            print("Encerrando o programa. Até mais!")
+            break
 
-    if modo == "voice_commands":
-        import voice_commands
-        voice_commands.main()  # função do módulo de voz
+        elif modo == "voice_commands":
+            import voice_commands
+            voice_commands.main()
+            break
 
-    elif modo == "hand_gesture":
-        import hand_gesture
-        hand_gesture.main()    # função do módulo de gestos
+        elif modo == "hand_gesture":
+            import hand_gesture
+            hand_gesture.main()
+            break
 
-    elif modo == "arduino_serial":
-        import arduino_serial
-        print("Modo Arduino ativo. Comandos podem ser enviados manualmente.")
-        # Se desejar executar algo automático, pode chamar uma função aqui
+        elif modo == "arduino_serial":
+            import arduino_serial
+            conectado = arduino_serial.check_connection()
+            if conectado:
+                print("Arduino está conectado ao PC.")
+            else:
+                print("Arduino NÃO está conectado ao PC.")
+            # volta para pedir modo
 
-    elif modo == "eye_control":
-        import eye_control
-        eye_control.main()     # função do módulo de controle ocular
+        elif modo == "eye_control":
+            import eye_control
+            eye_control.main()
+            break
 
+        else:
+            print("Modo inválido, tente novamente.")
