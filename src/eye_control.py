@@ -3,13 +3,11 @@ import mediapipe as mp
 import numpy as np
 import time
 import serial
+import pyttsx3
 
 mp_face_mesh = mp.solutions.face_mesh
-
-# Índices dos olhos (olho direito)
 OLHO_INDICES = [33, 160, 158, 133, 153, 144]
 
-# Mapeamento de comandos por direção
 EYE_COMMANDS = {
     "up": "ALL_ON",
     "down": "ALL_OFF",
@@ -17,12 +15,25 @@ EYE_COMMANDS = {
     "left": ["GREEN_ON", "RED_ON", "BLUE_ON"]
 }
 
-# Porta do Arduino (ajuste conforme necessário)
+# Arduino
 try:
-    arduino = serial.Serial('COM3', 9600)  # ou '/dev/ttyUSB0' no Linux
+    arduino = serial.Serial('COM3', 9600)  # Ajuste se necessário
 except:
     arduino = None
     print("Arduino não conectado.")
+
+# Voz
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+for voice in voices:
+    if "female" in voice.name.lower() or "zira" in voice.name.lower():
+        engine.setProperty('voice', voice.id)
+        break
+engine.setProperty('rate', 170)
+
+def falar(texto):
+    engine.say(texto)
+    engine.runAndWait()
 
 def calcular_ear(landmarks, frame_w, frame_h):
     p2 = np.array([landmarks[160].x * frame_w, landmarks[160].y * frame_h])
@@ -65,19 +76,33 @@ def enviar_para_arduino(comando):
             arduino.write((comando + '\n').encode())
             time.sleep(1)
 
+def tutorial():
+    falas = [
+        "Bem-vindo ao controle ocular.",
+        "Olhe para cima para ligar todas as luzes.",
+        "Olhe para baixo para desligar todas as luzes.",
+        "Olhe para a direita para acender uma luz de cada vez.",
+        "Olhe para a esquerda para acender uma luz por vez na ordem inversa.",
+        "Para sair, pisque duas vezes e depois mais duas vezes para confirmar."
+    ]
+    for frase in falas:
+        falar(frase)
+        time.sleep(1)
+
 def main():
-    print("Modo controle ocular ativado. Use seus olhos para enviar comandos.")
+    print("Modo ocular iniciado.")
+    tutorial()
     cap = cv2.VideoCapture(0)
     ear_limite = 0.2
     piscada_detectada = False
     contador_piscadas = 0
     confirmando_saida = False
     tempo_confirmacao = 0
+    ultimo_comando = ""
 
     with mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True,
                                 min_detection_confidence=0.5,
                                 min_tracking_confidence=0.5) as face_mesh:
-        ultimo_comando = ""
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -96,30 +121,34 @@ def main():
                     if not piscada_detectada:
                         piscada_detectada = True
                         contador_piscadas += 1
-                        print(f"PISCADA {contador_piscadas}")
                         if contador_piscadas == 2:
                             if confirmando_saida:
-                                print("Saída confirmada.")
+                                falar("Saindo do controle ocular.")
                                 cap.release()
                                 cv2.destroyAllWindows()
                                 return "EXIT"
                             else:
                                 confirmando_saida = True
                                 tempo_confirmacao = time.time()
-                                print("Aguardando confirmação de saída com mais 2 piscadas...")
-                        elif confirmando_saida:
-                            confirmando_saida = False
+                                falar("Deseja sair? Pisque mais duas vezes.")
                 else:
                     piscada_detectada = False
 
                 if confirmando_saida and (time.time() - tempo_confirmacao > 3):
                     confirmando_saida = False
                     contador_piscadas = 0
-                    print("Tempo de confirmação expirado. Cancelando saída.")
+                    falar("Tempo de confirmação esgotado.")
 
                 if direcao in EYE_COMMANDS and direcao != ultimo_comando:
                     enviar_para_arduino(EYE_COMMANDS[direcao])
-                    print(f"Comando ocular: {direcao.upper()} → {EYE_COMMANDS[direcao]}")
+                    if direcao == "up":
+                        falar("Luzes ligadas")
+                    elif direcao == "down":
+                        falar("Luzes desligadas")
+                    elif direcao == "right":
+                        falar("Sequência da direita")
+                    elif direcao == "left":
+                        falar("Sequência da esquerda")
                     ultimo_comando = direcao
 
                 cv2.putText(frame, f"Olhar: {direcao}", (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
@@ -133,4 +162,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
