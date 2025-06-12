@@ -1,22 +1,36 @@
 import speech_recognition as sr
+import pyttsx3
 
-print("Este programa ativa modos por comando de voz.")
+# Inicializa engine de voz
+engine = pyttsx3.init()
+# Seleciona voz feminina (pt-BR)
+for v in engine.getProperty('voices'):
+    if 'pt' in v.languages or 'Maria' in v.name:
+        engine.setProperty('voice', v.id)
+        break
+
+# Função para falar
+def say(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Introdução falada
+say("Este programa ativa modos por comando de voz.")
 
 def escolher_modo():
     recognizer = sr.Recognizer()
     mic = sr.Microphone()
-    
-    print("Diga o nome do robô seguido do modo: 'comando por voz', 'comando por gestos', 'arduino', 'controle ocular' ou 'ira encerrar' para sair.")
+    say("Sou todo ouvidos")
 
     with mic as source:
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
-    
+
     try:
         frase = recognizer.recognize_google(audio, language='pt-BR').lower()
-        print(f"Você disse: {frase}")
+        say(f"Você disse: {frase}")
         if "lira" in frase:
-            if "encerrar" in frase or "sair" in frase:
+            if any(p in frase for p in ["encerrar", "sair"]):
                 return "encerrar"
             elif "comando por voz" in frase:
                 return "voice_commands"
@@ -26,50 +40,46 @@ def escolher_modo():
                 return "arduino_serial"
             elif "controle ocular" in frase or "controle de olhar" in frase:
                 return "eye_control"
-        print("Não reconheci um modo válido. Tente novamente.")
+        say("Não reconheci um modo válido. Tente novamente.")
     except Exception as e:
-        print("Erro no reconhecimento:", e)
+        say("Erro no reconhecimento.")
     return None
-
 
 if __name__ == "__main__":
     while True:
         modo = escolher_modo()
         if modo == "encerrar":
-            print("Encerrando o programa. Até mais!")
+            say("Encerrando o programa. Até mais!")
             break
 
         elif modo == "voice_commands":
             import voice_commands
             resultado = voice_commands.main()
             if resultado == "EXIT":
-                print("Retornando ao menu principal após encerramento do modo comando por voz.")
-                continue  # volta para escolher modo
+                say("Retornando ao menu principal após encerramento do modo comando por voz.")
+                continue
 
         elif modo == "hand_gesture":
-           import hand_gesture
-           resultado = hand_gesture.main()
-           if resultado == "EXIT":
-               print("Retornando ao menu principal após encerramento do modo por gestos.")
-               continue
-
+            import hand_gesture
+            resultado = hand_gesture.main()
+            if resultado == "EXIT":
+                say("Retornando ao menu principal após encerramento do modo por gestos.")
+                continue
 
         elif modo == "arduino_serial":
             import arduino_serial
             conectado = arduino_serial.check_connection()
             if conectado:
-                print("Arduino está conectado ao PC.")
+                say("Arduino está conectado ao PC.")
             else:
-                print("Arduino NÃO está conectado ao PC.")
-            # volta para pedir modo
+                say("Arduino não está conectado ao PC.")
 
         elif modo == "eye_control":
             import eye_control
             resultado = eye_control.main()
             if resultado == "EXIT":
-                print("Retornando ao menu principal após encerramento do controle ocular.")
+                say("Retornando ao menu principal após encerramento do controle ocular.")
                 continue
 
-
         else:
-            print("Modo inválido, tente novamente.")
+            say("Modo inválido, tente novamente.")
