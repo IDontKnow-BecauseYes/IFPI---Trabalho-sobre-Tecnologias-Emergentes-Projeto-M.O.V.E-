@@ -1,5 +1,7 @@
 import speech_recognition as sr
 
+print("Este programa ativa modos por comando de voz.")
+
 def escolher_modo():
     recognizer = sr.Recognizer()
     mic = sr.Microphone()
@@ -14,7 +16,7 @@ def escolher_modo():
         frase = recognizer.recognize_google(audio, language='pt-BR').lower()
         print(f"Você disse: {frase}")
         if "lira" in frase:
-            if "ira encerrar" in frase or "vai encerrar" in frase or "vai sair" in frase or "ira sair" in frase:
+            if "encerrar" in frase or "sair" in frase:
                 return "encerrar"
             elif "comando por voz" in frase:
                 return "voice_commands"
