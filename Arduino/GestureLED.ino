@@ -17,11 +17,11 @@ void setup() {
 }
 
 void loop() {
-  // Verifica conexão Bluetooth
+  // Essa parte verifica a conexão Bluetooth 
   bool isConnected = digitalRead(STATE_PIN);
 
   if (isConnected && !wasConnected) {
-    // Conectado agora, mas não estava antes — piscar LEDs
+    // piscar LEDs quando conectar o arduino
     for (int i = 0; i < 2; i++) {
       digitalWrite(BLUE_PIN, HIGH);
       digitalWrite(RED_PIN, HIGH);
@@ -37,7 +37,6 @@ void loop() {
     wasConnected = false;
   }
 
-  // Verifica comandos recebidos
   if (Serial.available()) {
     String cmd = Serial.readStringUntil('\n');
     cmd.trim();
